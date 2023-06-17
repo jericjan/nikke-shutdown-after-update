@@ -1,16 +1,19 @@
+import datetime
+from ctypes import windll
+from pathlib import Path
+
+import pyautogui
 import win32gui
 import win32ui
-from ctypes import windll
 from PIL import Image
-import datetime
-from pathlib import Path
-import pyautogui
+
 from feature_match import find_match
+
 
 def screenshot_window_check(window_name):
     hwnd = win32gui.FindWindowEx(None, None, "UnityWndClass", window_name)
     print(f"Window ID: {hwnd}", end=", ")
-    class_name = win32gui.GetClassName(hwnd)    
+    class_name = win32gui.GetClassName(hwnd)
     print(f"Class name: {class_name}", end=", ")
 
     # Change the line below depending on whether you want the whole window
@@ -54,18 +57,14 @@ def screenshot_window_check(window_name):
 
         # format the date and time as a string
         date_string = now.strftime("%Y-%m-%d_%H-%M-%S")
-        
-        filename = f"shot_{date_string}.png"        
+
+        filename = f"shot_{date_string}.png"
         full_path = f"screenshots/{filename}"
         Path("screenshots").mkdir(exist_ok=True)
         im.save(full_path)
         try:
-            coords = pyautogui.locate("login_screen.png", full_path, confidence=0.9)            
+            coords = pyautogui.locate("login_screen.png", full_path, confidence=0.9)
             print(f"Coords if found: {coords}")
-            find_match(full_path)
-            if coords is not None:
-                return True
-            else:
-                return False
+            return find_match(full_path)
         except pyautogui.ImageNotFoundException:
             return False
