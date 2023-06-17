@@ -1,0 +1,4 @@
+.vscode/
+__pycache__/
+screenshots/*
+nikke_log.txt
