@@ -1,34 +1,20 @@
 from pathlib import Path
 import time
 import datetime
-from screenshot import screenshot_window
-
-def is_generator_empty(generator):
-    """
-    Check if a generator is empty.
-    Return True if the generator is empty, False otherwise.
-    """
-    try:
-        next(generator)
-        return False
-    except StopIteration:
-        return True
+from screenshot import screenshot_window_check
 
 
 p = Path("F:/NIKKE/AppData-LocalLow-Unity/com_proximabeta_NIKKE")
 
-lock_files = p.rglob("__lock")
-
-
-def in_use(lock_files):
+def in_use():
     """
     Check if a generator is empty.
     If empty, try again 2 more times with a 10 second delay between each
     attempt.
     """
     for i in range(3):
-        screenshot_window("NIKKE")
-        if not is_generator_empty(lock_files):
+        found = screenshot_window_check("NIKKE")
+        if not found:
             log("file is downloading")
             return True
         else:
@@ -49,6 +35,6 @@ def log(msg):
 
 
 while True:
-    if not in_use(lock_files):
+    if not in_use():
         break
     time.sleep(60)

@@ -3,14 +3,16 @@ import win32ui
 from ctypes import windll
 from PIL import Image
 import datetime
+from pathlib import Path
+import pyautogui
+from feature_match import find_match
 
-
-def screenshot_window(window_name):
+def screenshot_window_check(window_name):
     hwnd = win32gui.FindWindowEx(None, None, "UnityWndClass", window_name)
-    print(hwnd)
-    class_name = win32gui.GetClassName(hwnd)
-    print(class_name)  
-    
+    print(f"Window ID: {hwnd}", end=", ")
+    class_name = win32gui.GetClassName(hwnd)    
+    print(f"Class name: {class_name}", end=", ")
+
     # Change the line below depending on whether you want the whole window
     # or just the client area.
     # left, top, right, bot = win32gui.GetClientRect(hwnd)
@@ -31,7 +33,7 @@ def screenshot_window(window_name):
     # or just the client area.
     # result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 1)
     result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 2)
-    print(result)
+    print(f"PrintWindow result: {result}")
 
     bmpinfo = saveBitMap.GetInfo()
     bmpstr = saveBitMap.GetBitmapBits(True)
@@ -54,4 +56,16 @@ def screenshot_window(window_name):
         date_string = now.strftime("%Y-%m-%d_%H-%M-%S")
         
         filename = f"shot_{date_string}.png"        
-        im.save(f"screenshots/{filename}")
+        full_path = f"screenshots/{filename}"
+        Path("screenshots").mkdir(exist_ok=True)
+        im.save(full_path)
+        try:
+            coords = pyautogui.locate("login_screen.png", full_path, confidence=0.9)            
+            print(f"Coords if found: {coords}")
+            find_match(full_path)
+            if coords is not None:
+                return True
+            else:
+                return False
+        except pyautogui.ImageNotFoundException:
+            return False
